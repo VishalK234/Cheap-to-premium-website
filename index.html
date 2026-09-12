@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Level Up — Upgrade This Website</title>
+<meta name="description" content="A CSS-only game: click through pricing tiers and watch a website evolve from Geocities-era dirt to enterprise-grade premium.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+  /* ---------- Reset ---------- */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body, h1, h2, h3, p, blockquote, fieldset { margin: 0; padding: 0; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  fieldset { border: none; }
+  a { color: inherit; }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
+
+  .skip-link {
+    position: absolute; left: 1rem; top: -3rem;
+    background: #111; color: #fff; padding: .6rem 1rem;
+    border-radius: 4px; transition: top .2s ease; z-index: 100;
+  }
+  .skip-link:focus { top: 1rem; }
+
+  /* ================================================================
+     TOKENS — one full palette/type/shape system per level.
+     Everything downstream just reads var(--...); nothing else
+     needs to change when a level's identity changes.
+     ================================================================ */
+  :root {
+    --level-count: 6;
+  }
+
+  body {
+    /* Level 0 — "Dirt": the bill's overdue, so the lights are out */
+    --bg: #050505;
+    --bg-image: none;
+    --text: #6e6e6e;
+    --muted: #4a4a4a;
+    --primary: #35415e;
+    --primary-2: #2a2a2a;
+    --surface: #0d0d0d;
+    --border: #222222;
+    --border-w: 2px;
+    --radius: 0px;
+    --shadow: none;
+    --font-body: "Times New Roman", Times, serif;
+    --font-display: "Times New Roman", Times, serif;
+    --headline-size: clamp(1.6rem, 5vw, 2.1rem);
+    --headline-weight: 700;
+    --headline-style: normal;
+    --gap: 1rem;
+    --section-pad: 1.5rem 1rem;
+    --card-pad: 1rem;
+
+    background: var(--bg-image), var(--bg);
+    background-color: var(--bg);
+    background-blend-mode: normal;
+    color: var(--text);
+    font-family: var(--font-body);
+    transition: background-color .5s ease, color .4s ease;
+    min-height: 100vh;
+  }
+
+  body:has(#lvl1:checked) {
+    --bg: #ffffff;
+    --text: #232323;
+    --muted: #5b5b5b;
+    --primary: #2563eb;
+    --primary-2: #1d4ed8;
+    --surface: #f7f8fa;
+    --border: #e0e0e0;
+    --border-w: 1px;
+    --radius: 4px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08);
+    --font-body: Arial, Helvetica, sans-serif;
+    --font-display: Arial, Helvetica, sans-serif;
+    --headline-size: clamp(1.9rem, 5vw, 2.6rem);
+    --headline-weight: 700;
+    --gap: 1.25rem;
+    --section-pad: 2.5rem 1.25rem;
+    --card-pad: 1.25rem;
+  }
+
+  body:has(#lvl2:checked) {
+    --bg: #f6f4ee;
+    --text: #1f2933;
+    --muted: #5b6472;
+    --primary: #1f8a70;
+    --primary-2: #f2b134;
+    --surface: #ffffff;
+    --border: #e6e1d3;
+    --border-w: 1px;
+    --radius: 12px;
+    --shadow: 0 8px 20px rgba(31,41,51,.08);
+    --font-body: "Inter", system-ui, sans-serif;
+    --font-display: "Inter", system-ui, sans-serif;
+    --headline-size: clamp(2.1rem, 5vw, 3rem);
+    --headline-weight: 700;
+    --gap: 1.5rem;
+    --section-pad: 3.5rem 1.5rem;
+    --card-pad: 1.5rem;
+  }
+
+  body:has(#lvl3:checked) {
+    --bg: #f4f1ff;
+    --text: #1e1b2e;
+    --muted: #675e80;
+    --primary: #4f46e5;
+    --primary-2: #fb7185;
+    --surface: #ffffff;
+    --border: #e2daf9;
+    --border-w: 1px;
+    --radius: 18px;
+    --shadow: 0 14px 34px rgba(79,70,229,.16);
+    --font-body: "Inter", system-ui, sans-serif;
+    --font-display: "Fraunces", serif;
+    --headline-size: clamp(2.4rem, 5.5vw, 3.4rem);
+    --headline-weight: 600;
+    --headline-style: italic;
+    --gap: 1.75rem;
+    --section-pad: 4rem 1.5rem;
+    --card-pad: 1.75rem;
+  }
+
+  body:has(#lvl4:checked) {
+    --bg: #faf9f6;
+    --text: #151515;
+    --muted: #6b6b6b;
+    --primary: #151515;
+    --primary-2: #d79a1f;
+    --surface: #ffffff;
+    --border: #e4e1d8;
+    --border-w: 1px;
+    --radius: 2px;
+    --shadow: none;
+    --font-body: "Inter", system-ui, sans-serif;
+    --font-display: "Fraunces", serif;
+    --headline-size: clamp(2.8rem, 6.5vw, 4.4rem);
+    --headline-weight: 500;
+    --headline-style: normal;
+    --gap: 2rem;
+    --section-pad: 5rem 1.5rem;
+    --card-pad: 2rem;
+  }
+
+  body:has(#lvl5:checked) {
+    --bg: #0c1024;
+    --bg-image: radial-gradient(circle at 15% 15%, rgba(139,127,209,.25), transparent 45%),
+                radial-gradient(circle at 85% 30%, rgba(212,175,55,.18), transparent 40%),
+                linear-gradient(160deg, #0b1020 0%, #161b33 45%, #1c2148 100%);
+    --text: #f4f0e6;
+    --muted: #b6b0c8;
+    --primary: #d4af37;
+    --primary-2: #8b7fd1;
+    --surface: rgba(255,255,255,.06);
+    --border: rgba(212,175,55,.35);
+    --border-w: 1px;
+    --radius: 20px;
+    --shadow: 0 24px 60px rgba(0,0,0,.55);
+    --font-body: "Inter", system-ui, sans-serif;
+    --font-display: "Fraunces", serif;
+    --headline-size: clamp(2.6rem, 6vw, 4rem);
+    --headline-weight: 600;
+    --headline-style: italic;
+    --gap: 2rem;
+    --section-pad: 5rem 1.5rem;
+    --card-pad: 2rem;
+  }
+
+  /* Ambient shimmer layer, only alive on the top tier */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background: conic-gradient(from 0deg at 50% 50%, rgba(212,175,55,.08), transparent 30%, rgba(139,127,209,.08), transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity .6s ease;
+  }
+  body:has(#lvl5:checked)::before {
+    opacity: 1;
+    animation: spin 18s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Overdue-bill flicker, only alive on the free tier */
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    background: radial-gradient(circle at 50% 22%, rgba(255,241,199,.10), transparent 45%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity .3s ease;
+  }
+  body:has(#lvl0:checked)::after {
+    opacity: 1;
+    animation: bulb-flicker 4.5s infinite;
+  }
+  body:has(#lvl0:checked) .site {
+    animation: bulb-flicker 4.5s infinite;
+  }
+  @keyframes bulb-flicker {
+    0%, 19%, 21%, 23%, 54%, 56%, 82%, 84%, 100% { opacity: 1; filter: brightness(1); }
+    20%, 55% { opacity: .4; filter: brightness(.55); }
+    22%, 83% { opacity: .75; filter: brightness(.8); }
+  }
+
+  /* ---------- Layout shell ---------- */
+  .site { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
+  main { display: block; }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--gap);
+    padding: var(--section-pad);
+    padding-top: 1.25rem; padding-bottom: 1.25rem;
+    border-bottom: var(--border-w) solid var(--border);
+    flex-wrap: wrap;
+  }
+  .brand {
+    font-family: var(--font-display);
+    font-weight: var(--headline-weight);
+    font-style: var(--headline-style);
+    font-size: 1.4rem;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+  }
+  .secret-toggle:focus-visible + .brand {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+  }
+  .nav-list { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .nav-list li { color: var(--muted); font-size: .95rem; }
+  .nav-item-about, .nav-item-pricing, .nav-item-blog, .nav-item-careers { display: none; }
+  .demo-btn {
+    display: none;
+    text-decoration: none;
+    padding: .55rem 1.1rem;
+    border-radius: var(--radius);
+    background: var(--primary);
+    color: var(--bg);
+    font-weight: 600;
+    box-shadow: var(--shadow);
+  }
+
+  body:has(#lvl1:checked) .nav-item-about,
+  body:has(#lvl2:checked) .nav-item-about,
+  body:has(#lvl3:checked) .nav-item-about,
+  body:has(#lvl4:checked) .nav-item-about,
+  body:has(#lvl5:checked) .nav-item-about { display: block; }
+
+  body:has(#lvl2:checked) .nav-item-pricing,
+  body:has(#lvl3:checked) .nav-item-pricing,
+  body:has(#lvl4:checked) .nav-item-pricing,
+  body:has(#lvl5:checked) .nav-item-pricing { display: block; }
+
+  body:has(#lvl3:checked) .nav-item-blog,
+  body:has(#lvl4:checked) .nav-item-blog,
+  body:has(#lvl5:checked) .nav-item-blog { display: block; }
+
+  body:has(#lvl4:checked) .nav-item-careers,
+  body:has(#lvl5:checked) .nav-item-careers { display: block; }
+
+  body:has(#lvl5:checked) .demo-btn { display: inline-block; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    padding: var(--section-pad);
+    text-align: center;
+    position: relative;
+  }
+  .badge {
+    display: inline-block;
+    font-size: .85rem;
+    color: var(--muted);
+    border: var(--border-w) solid var(--border);
+    border-radius: calc(var(--radius) + 20px);
+    padding: .3rem .9rem;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: var(--headline-weight);
+    font-style: var(--headline-style);
+    font-size: var(--headline-size);
+    line-height: 1.15;
+    max-width: 18ch;
+    margin: 0 auto .9rem;
+  }
+  .hero .sub {
+    color: var(--muted);
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    max-width: 46ch;
+    margin: 0 auto;
+  }
+  .copy { display: none; }
+  body:has(#lvl0:checked) .lvl-copy-0,
+  body:has(#lvl1:checked) .lvl-copy-1,
+  body:has(#lvl2:checked) .lvl-copy-2,
+  body:has(#lvl3:checked) .lvl-copy-3,
+  body:has(#lvl4:checked) .lvl-copy-4,
+  body:has(#lvl5:checked) .lvl-copy-5 { display: inline; }
+  .hero h1 .copy, .hero .badge .copy { display: none; }
+  body:has(#lvl0:checked) .hero h1 .lvl-copy-0,
+  body:has(#lvl1:checked) .hero h1 .lvl-copy-1,
+  body:has(#lvl2:checked) .hero h1 .lvl-copy-2,
+  body:has(#lvl3:checked) .hero h1 .lvl-copy-3,
+  body:has(#lvl4:checked) .hero h1 .lvl-copy-4,
+  body:has(#lvl5:checked) .hero h1 .lvl-copy-5,
+  body:has(#lvl0:checked) .badge .lvl-copy-0,
+  body:has(#lvl1:checked) .badge .lvl-copy-1,
+  body:has(#lvl2:checked) .badge .lvl-copy-2,
+  body:has(#lvl3:checked) .badge .lvl-copy-3,
+  body:has(#lvl4:checked) .badge .lvl-copy-4,
+  body:has(#lvl5:checked) .badge .lvl-copy-5 { display: block; }
+
+  /* One shape, six lives: a dead bulb on the free tier, a glowing
+     orb by the time you're "enterprise". Same element throughout. */
+  .hero-art {
+    position: relative;
+    width: 120px; height: 120px;
+    margin: 2.5rem auto 0;
+    border-radius: 30% 70% 65% 35% / 40% 35% 65% 60%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    opacity: 1;
+    transform: scale(.7);
+    transition: opacity .5s ease, transform .5s ease, border-radius .5s ease, box-shadow .5s ease;
+  }
+  .hero-art::before {
+    /* the cord/wire hanging above the bulb */
+    content: "";
+    position: absolute;
+    left: 50%; top: -2rem;
+    width: 2px; height: 2rem;
+    background: var(--border);
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity .4s ease;
+  }
+  body:has(#lvl0:checked) .hero-art,
+  body:has(#lvl1:checked) .hero-art { border-radius: 50%; transform: scale(.85); }
+  body:has(#lvl0:checked) .hero-art {
+    background: #111111;
+    box-shadow: inset 0 0 0 2px #2a2a2a;
+  }
+  body:has(#lvl0:checked) .hero-art::before,
+  body:has(#lvl1:checked) .hero-art::before { opacity: 1; }
+  body:has(#lvl1:checked) .hero-art { box-shadow: 0 0 12px 2px rgba(37,99,235,.25); }
+  body:has(#lvl2:checked) .hero-art,
+  body:has(#lvl3:checked) .hero-art,
+  body:has(#lvl4:checked) .hero-art,
+  body:has(#lvl5:checked) .hero-art { opacity: 1; transform: scale(1); }
+  body:has(#lvl4:checked) .hero-art { border-radius: 50%; }
+  body:has(#lvl5:checked) .hero-art {
+    border-radius: 50%;
+    box-shadow: 0 0 50px 6px rgba(212,175,55,.35);
+  }
+
+  /* ---------- Upgrade panel (the "game") ---------- */
+  .upgrade {
+    padding: var(--section-pad);
+    border-top: var(--border-w) solid var(--border);
+    border-bottom: var(--border-w) solid var(--border);
+    text-align: center;
+  }
+  .upgrade h2 {
+    font-family: var(--font-display);
+    font-weight: var(--headline-weight);
+    font-style: var(--headline-style);
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    margin-bottom: .4rem;
+  }
+  .upgrade-sub { color: var(--muted); margin-bottom: 1.75rem; }
+
+  .tiers {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem;
+    margin-bottom: 1.75rem;
+  }
+  .tiers input[type="radio"] {
+    position: absolute;
+    width: 1px; height: 1px;
+    opacity: 0; overflow: hidden;
+  }
+  .tier {
+    cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: .2rem;
+    padding: .75rem 1.1rem;
+    min-width: 92px;
+    border: var(--border-w) solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow);
+    transition: transform .2s ease, border-color .3s ease;
+  }
+  .tier:hover { transform: translateY(-3px); }
+  .tier-name { font-weight: 600; font-size: .95rem; }
+  .tier-price { color: var(--muted); font-size: .85rem; }
+
+  input:focus-visible + .tier {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  body:has(#lvl0:checked) .t0,
+  body:has(#lvl1:checked) .t1,
+  body:has(#lvl2:checked) .t2,
+  body:has(#lvl3:checked) .t3,
+  body:has(#lvl4:checked) .t4,
+  body:has(#lvl5:checked) .t5 {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--bg);
+  }
+  body:has(#lvl0:checked) .t0 .tier-price,
+  body:has(#lvl1:checked) .t1 .tier-price,
+  body:has(#lvl2:checked) .t2 .tier-price,
+  body:has(#lvl3:checked) .t3 .tier-price,
+  body:has(#lvl4:checked) .t4 .tier-price,
+  body:has(#lvl5:checked) .t5 .tier-price { color: inherit; opacity: .85; }
+
+  .xp-track {
+    max-width: 420px; margin: 0 auto;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: var(--border-w) solid var(--border);
+    overflow: hidden;
+  }
+  .xp-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-2));
+    transition: width .5s ease;
+  }
+  body:has(#lvl0:checked) .xp-fill { width: 4%; }
+  body:has(#lvl1:checked) .xp-fill { width: 20%; }
+  body:has(#lvl2:checked) .xp-fill { width: 40%; }
+  body:has(#lvl3:checked) .xp-fill { width: 60%; }
+  body:has(#lvl4:checked) .xp-fill { width: 80%; }
+  body:has(#lvl5:checked) .xp-fill { width: 100%; }
+
+  /* ---------- Feature cards ---------- */
+  .features {
+    padding: var(--section-pad);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--gap);
+  }
+  .card {
+    background: var(--surface);
+    border: var(--border-w) solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: var(--card-pad);
+    transition: transform .2s ease;
+  }
+  body:has(#lvl4:checked) .card:hover,
+  body:has(#lvl5:checked) .card:hover { transform: translateY(-4px); }
+  .card h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    margin-bottom: .4rem;
+  }
+  .card p { color: var(--muted); font-size: .95rem; }
+
+  /* ---------- Testimonial (unlocks once you're "funded") ---------- */
+  .testimonial-block { display: none; }
+  body:has(#lvl3:checked) .testimonial-block,
+  body:has(#lvl4:checked) .testimonial-block,
+  body:has(#lvl5:checked) .testimonial-block { display: block; }
+  .testimonial-block {
+    padding: var(--section-pad);
+    text-align: center;
+  }
+  .testimonial-block blockquote {
+    max-width: 50ch; margin: 0 auto;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-style: var(--headline-style);
+    color: var(--text);
+  }
+  .testimonial-block cite {
+    display: block;
+    margin-top: 1rem;
+    font-size: .9rem;
+    color: var(--muted);
+    font-style: normal;
+  }
+
+  /* ---------- Footer ---------- */
+  .site-footer {
+    padding: var(--section-pad);
+    border-top: var(--border-w) solid var(--border);
+    color: var(--muted);
+    font-size: .9rem;
+  }
+  .footer-columns { display: none; gap: 3rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  body:has(#lvl4:checked) .footer-columns,
+  body:has(#lvl5:checked) .footer-columns { display: flex; }
+  .footer-columns h4 {
+    color: var(--text);
+    font-family: var(--font-display);
+    font-weight: 600;
+    margin-bottom: .5rem;
+    font-size: .95rem;
+  }
+  .footer-columns p { margin-bottom: .3rem; }
+
+  /* ---------- Easter egg: click the logo ---------- */
+  .secret-banner {
+    position: fixed;
+    left: 50%; bottom: 1.25rem;
+    transform: translateX(-50%) translateY(150%);
+    max-width: 90vw;
+    margin: 0;
+    padding: .75rem 1.25rem;
+    border-radius: 999px;
+    background: #111;
+    color: #f5f5f5;
+    font-size: .9rem;
+    text-align: center;
+    box-shadow: 0 14px 34px rgba(0,0,0,.4);
+    border: 2px solid transparent;
+    background-image: linear-gradient(#111, #111),
+      linear-gradient(90deg, #ff5c5c, #ffcf5c, #5cff8f, #5cc9ff, #a05cff, #ff5c5c);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    background-size: auto, 300% 100%;
+    opacity: 0;
+    z-index: 60;
+    pointer-events: none;
+    transition: opacity .4s ease, transform .4s ease;
+  }
+  body:has(#secret:checked) .secret-banner {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    animation: rainbow-border 4s linear infinite;
+  }
+  @keyframes rainbow-border { to { background-position: 0 0, 300% 0; } }
+  .secret-rainbow {
+    font-weight: 700;
+    background: linear-gradient(90deg, #ff5c5c, #ffcf5c, #5cff8f, #5cc9ff, #a05cff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* found it: the bulb goes disco regardless of which tier you're on */
+  body:has(#secret:checked) .hero-art {
+    animation: disco-spin 2.5s linear infinite, disco-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes disco-spin { to { filter: hue-rotate(360deg); } }
+  @keyframes disco-pulse {
+    0%, 100% { box-shadow: 0 0 20px 4px rgba(255,255,255,.25); }
+    50% { box-shadow: 0 0 40px 10px rgba(255,255,255,.45); }
+  }
+
+  /* ---------- Click-to-earn mini-game ---------- */
+  .clicker-game {
+    counter-reset: coins 0;
+    padding: var(--section-pad);
+    text-align: center;
+    border-bottom: var(--border-w) solid var(--border);
+  }
+  .clicker-game h2 {
+    font-family: var(--font-display);
+    font-weight: var(--headline-weight);
+    font-style: var(--headline-style);
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    margin-bottom: .4rem;
+  }
+  .clicker-sub { color: var(--muted); margin-bottom: 1.75rem; }
+
+  .coin-stack {
+    position: relative;
+    width: 96px; height: 96px;
+    margin: 0 auto 1.25rem;
+    padding: 0;
+    border: none;
+    min-width: 0;
+  }
+  .coin-input {
+    position: absolute;
+    width: 1px; height: 1px;
+    opacity: 0; overflow: hidden;
+  }
+  .coin-label {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    font-size: 1.7rem;
+    background: linear-gradient(145deg, var(--primary-2), var(--primary));
+    color: var(--bg);
+    cursor: pointer;
+    user-select: none;
+    box-shadow: var(--shadow), 0 4px 12px rgba(0,0,0,.3);
+    transition: opacity .15s ease, transform .15s ease;
+  }
+  .coin-label:hover { transform: scale(1.06); }
+  .coin-input:checked + .coin-label {
+    opacity: 0;
+    transform: scale(1.6);
+    pointer-events: none;
+  }
+  .coin-input:checked { counter-increment: coins 1; }
+  .coin-input:focus-visible + .coin-label {
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
+  }
+
+  .coin-count-wrap { color: var(--muted); font-size: 1.05rem; }
+  .coin-count-wrap strong { color: var(--text); }
+  .coin-count::after { content: counter(coins); }
+  .clicker-maxed { display: none; }
+  .clicker-game:has(.coin-input:first-of-type:checked) .clicker-hint { display: none; }
+  .clicker-game:has(.coin-input:first-of-type:checked) .clicker-maxed { display: inline; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 640px) {
+    .nav { justify-content: center; text-align: center; }
+    .nav-list { justify-content: center; }
+  }
+
+  /* ---------- Motion respect ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="site">
+
+  <header class="nav">
+    <input type="checkbox" id="secret" class="sr-only secret-toggle">
+    <label for="secret" class="brand" title="psst...">Nimbus</label>
+    <nav aria-label="Primary">
+      <ul class="nav-list">
+        <li>Home</li>
+        <li class="nav-item-about">About</li>
+        <li class="nav-item-pricing">Pricing</li>
+        <li class="nav-item-blog">Blog</li>
+        <li class="nav-item-careers">Careers</li>
+      </ul>
+    </nav>
+    <a href="#upgrade" class="demo-btn">Get a demo</a>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <p class="badge">
+        <span class="copy lvl-copy-0">⚠ Electricity bill: unpaid</span>
+        <span class="copy lvl-copy-1">Status: live</span>
+        <span class="copy lvl-copy-2">Status: shipped</span>
+        <span class="copy lvl-copy-3">Status: funded</span>
+        <span class="copy lvl-copy-4">Status: award submitted</span>
+        <span class="copy lvl-copy-5">Status: enterprise ready</span>
+      </p>
+      <h1>
+        <span class="copy lvl-copy-0">welcome 2 my website!!! (the lights are out)</span>
+        <span class="copy lvl-copy-1">Welcome to my website</span>
+        <span class="copy lvl-copy-2">Build something people want</span>
+        <span class="copy lvl-copy-3">We just raised our Series A</span>
+        <span class="copy lvl-copy-4">Design, considered.</span>
+        <span class="copy lvl-copy-5">The future of the web is here</span>
+      </h1>
+      <p class="sub">
+        <span class="copy lvl-copy-0">best viewed in netscape navigator at 800x600 — squint, the power's out</span>
+        <span class="copy lvl-copy-1">A clean, simple homepage.</span>
+        <span class="copy lvl-copy-2">Our startup's home on the web, finally looking sharp.</span>
+        <span class="copy lvl-copy-3">Same product, shinier site, twelve new hires you'll never meet.</span>
+        <span class="copy lvl-copy-4">Every pixel here survived three rounds of feedback.</span>
+        <span class="copy lvl-copy-5">Enterprise-grade. Boardroom-approved. Slightly excessive.</span>
+      </p>
+      <div class="hero-art" aria-hidden="true"></div>
+    </section>
+
+    <section class="upgrade" id="upgrade">
+      <h2>Upgrade this website</h2>
+      <p class="upgrade-sub">Pick a plan. Watch everything above change.</p>
+
+      <fieldset class="tiers">
+        <legend class="sr-only">Choose a website tier</legend>
+
+        <input type="radio" name="lvl" id="lvl0" checked>
+        <label for="lvl0" class="tier t0">
+          <span class="tier-name">Dirt</span>
+          <span class="tier-price">$0</span>
+        </label>
+
+        <input type="radio" name="lvl" id="lvl1">
+        <label for="lvl1" class="tier t1">
+          <span class="tier-name">Basic</span>
+          <span class="tier-price">$9</span>
+        </label>
+
+        <input type="radio" name="lvl" id="lvl2">
+        <label for="lvl2" class="tier t2">
+          <span class="tier-name">Startup</span>
+          <span class="tier-price">$29</span>
+        </label>
+
+        <input type="radio" name="lvl" id="lvl3">
+        <label for="lvl3" class="tier t3">
+          <span class="tier-name">Funded</span>
+          <span class="tier-price">$99</span>
+        </label>
+
+        <input type="radio" name="lvl" id="lvl4">
+        <label for="lvl4" class="tier t4">
+          <span class="tier-name">Agency</span>
+          <span class="tier-price">$299</span>
+        </label>
+
+        <input type="radio" name="lvl" id="lvl5">
+        <label for="lvl5" class="tier t5">
+          <span class="tier-name">Enterprise</span>
+          <span class="tier-price">$999</span>
+        </label>
+      </fieldset>
+
+      <div class="xp-track" aria-hidden="true"><div class="xp-fill"></div></div>
+    </section>
+
+    <section class="clicker-game">
+      <h2>Or just earn it yourself</h2>
+      <p class="clicker-sub">Every coin is worth $1. There are 25 of them.</p>
+
+      <fieldset class="coin-stack">
+        <legend class="sr-only">Click the coin to earn one dollar, 25 times</legend>
+          <input type="checkbox" class="coin-input" id="coin1">
+          <label for="coin1" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin2">
+          <label for="coin2" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin3">
+          <label for="coin3" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin4">
+          <label for="coin4" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin5">
+          <label for="coin5" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin6">
+          <label for="coin6" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin7">
+          <label for="coin7" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin8">
+          <label for="coin8" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin9">
+          <label for="coin9" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin10">
+          <label for="coin10" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin11">
+          <label for="coin11" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin12">
+          <label for="coin12" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin13">
+          <label for="coin13" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin14">
+          <label for="coin14" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin15">
+          <label for="coin15" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin16">
+          <label for="coin16" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin17">
+          <label for="coin17" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin18">
+          <label for="coin18" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin19">
+          <label for="coin19" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin20">
+          <label for="coin20" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin21">
+          <label for="coin21" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin22">
+          <label for="coin22" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin23">
+          <label for="coin23" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin24">
+          <label for="coin24" class="coin-label">$</label>
+          <input type="checkbox" class="coin-input" id="coin25">
+          <label for="coin25" class="coin-label">$</label>
+      </fieldset>
+
+      <p class="coin-count-wrap">
+        You've earned $<strong class="coin-count"></strong> by clicking.
+        <span class="clicker-hint">Only $999 short of Enterprise, give or take.</span>
+        <span class="clicker-maxed">That's all 25 coins. Still $974 short of Enterprise.</span>
+      </p>
+    </section>
+
+    <section class="features">
+      <div class="card">
+        <h3>Fast</h3>
+        <p>Loads before you finish reading this sentence.</p>
+      </div>
+      <div class="card">
+        <h3>Reliable</h3>
+        <p>Hasn't gone down since we stopped checking.</p>
+      </div>
+      <div class="card">
+        <h3>Secure</h3>
+        <p>Protected by a password and a good attitude.</p>
+      </div>
+    </section>
+
+    <section class="testimonial-block">
+      <blockquote>
+        “We switched tiers and our bounce rate went down, our investors went up, and nobody can fully explain either.”
+        <cite>Jordan Lee, VP of Vibes</cite>
+      </blockquote>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-columns">
+      <div>
+        <h4>Company</h4>
+        <p>About</p>
+        <p>Careers</p>
+      </div>
+      <div>
+        <h4>Resources</h4>
+        <p>Blog</p>
+        <p>Docs</p>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <p>Privacy</p>
+        <p>Terms</p>
+      </div>
+    </div>
+    <p>© 2026 Nimbus. Built with radio buttons and questionable decisions.</p>
+  </footer>
+
+  <p class="secret-banner" role="status">
+    <span class="secret-rainbow">Secret tier unlocked: GODLIKE</span> — $∞/mo, refresh not required, just vibes.
+  </p>
+
+</div>
+</body>
+</html>
